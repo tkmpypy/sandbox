@@ -13,12 +13,20 @@ if [[ ! $version =~ ^v+[0-9](.[0-9]){1,2}$ ]]; then
     exit 1
 fi
 
-push_git_tag() {
-    echo "git push origin ${1}"          # for production
-    echo "git push origin ${1}-staging"
-    echo "git push origin ${1}-dev"
-    echo "git push origin ${1}-sandbox"
+create_git_tag() {
+    git tag ${1}
+    git tag ${1}-staging
+    git tag ${1}-dev
+    git tag ${1}-sandbox
 }
 
+push_git_tag() {
+    git push origin ${1}          # for production
+    git push origin ${1}-staging
+    git push origin ${1}-dev
+    git push origin ${1}-sandbox
+}
+
+create_git_tag $version
 push_git_tag $version
 
