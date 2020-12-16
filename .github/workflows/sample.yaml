@@ -1,0 +1,12 @@
+name: sample
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sample_job:
+    steps:
+      - uses: actions/checkout@v2
+      - run: pwd && ls -la
