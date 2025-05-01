@@ -28,24 +28,6 @@ jobs:
           cache: "npm"
           cache-dependency-path: "gha-cache/package-lock.json"
 
-      # - name: Cache apt packages
-      #   uses: actions/cache@v3
-      #   id: apt-cache
-      #   with:
-      #     path: |
-      #       /var/cache/apt
-      #       /var/lib/apt/lists
-      #     key: ${{ steps.apt-cache-key.outputs.key }}
-      #     restore-keys: ${{ steps.apt-cache-key.outputs.restore-keys }}
-
-      # - name: Update apt repositories
-      #   run: |
-      #     sudo apt-get update -y --allow-releaseinfo-change
-
-      # - name: Install Japanese fonts
-      #   run: |
-      #     sudo apt-get install -y fonts-noto-cjk fonts-noto-cjk-extra
-
       - name: Create apt-cache-key
         id: apt-cache-version
         run: echo "APT_CACHE_VERSION=$(date +%Y%U)" >> $GITHUB_ENV
