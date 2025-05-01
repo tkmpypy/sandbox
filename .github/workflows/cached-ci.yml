@@ -1,0 +1,59 @@
+name: Cached CI
+
+on:
+  workflow_call:
+  pull_request:
+    branches:
+      - "*"
+  push:
+    branches:
+      - main
+
+jobs:
+  sample_job:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: gha-cache
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: pwd
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "gha-cache/package-lock.json"
+
+      - name: Create apt-cache-key
+        id: apt-cache-version
+        run: echo "APT_CACHE_VERSION=$(date +%Y%U)" >> $GITHUB_ENV
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: fonts-noto-cjk fonts-noto-cjk-extra
+          version: ${{ env.APT_CACHE_VERSION }}
+          debug: true
+
+      - name: npm install
+        run: npm ci
+
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/playwright'].version)")" >> $GITHUB_ENV
+
+      - name: Cache playwright binaries
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install playwright
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: |
+          npx playwright install --with-deps chromium
