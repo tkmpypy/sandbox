@@ -46,10 +46,14 @@ jobs:
       #   run: |
       #     sudo apt-get install -y fonts-noto-cjk fonts-noto-cjk-extra
 
+      - name: Create apt-cache-key
+        id: apt-cache-version
+        run: echo "APT_CACHE_VERSION=$(date +%Y%U)" >> $GITHUB_ENV
+
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: fonts-noto-cjk fonts-noto-cjk-extra
-          version: 1.0
+          version: ${{ env.APT_CACHE_VERSION }}
           debug: true
 
       - name: npm install
